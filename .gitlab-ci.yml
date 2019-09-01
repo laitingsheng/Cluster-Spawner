@@ -1,3 +1,6 @@
+stages:
+  - image:ci
+
 .docker:
   image: docker:stable
   services:
@@ -17,8 +20,6 @@ ci-image:ansible-openstack:
     refs:
       - master
       - ci-image
-    changes:
-      - ansible-openstack/Dockerfile
   except:
     - schedules
 
