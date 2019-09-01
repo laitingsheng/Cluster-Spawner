@@ -48,6 +48,7 @@ ci-image:ansible-openstack:schedule-refresh:
   before_script:
     - source project.sh
     - source ${OS_IDENTITY_FILE}
+    - wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/openstack_inventory.py
     - chmod 755 openstack_inventory.py
     - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
   only:

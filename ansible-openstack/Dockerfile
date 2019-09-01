@@ -6,7 +6,7 @@ RUN ln -fs /usr/share/zoneinfo/Australia/Melbourne /etc/localtime
 
 RUN apt-get update -y
 RUN apt-get upgrade -y
-RUN apt-get install -y locales openssh-client python-pip
+RUN apt-get install -y wget locales openssh-client python-pip
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
