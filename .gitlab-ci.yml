@@ -49,7 +49,7 @@ ci-image:ansible-openstack:schedule-refresh:
     - source project.sh
     - source ${OS_IDENTITY_FILE}
     - chmod 755 openstack_inventory.py
-    - chmod 600 ${K8S_PRIVATE_KEY}
+    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
   only:
     refs:
       - master
@@ -62,13 +62,13 @@ launch:
   extends:
     - .ansible
   script:
-    - ansible-playbook -i openstack_inventory.py -e public_key_path=${K8S_PUBLIC_KEY} launch.yml
+    - ansible-playbook -i openstack_inventory.py -e public_key_path=${K8S_MASTER_PUBLIC_KEY} launch.yml
 
 init:
   stage: ansible:init
   extends:
     - .ansible
   script:
-    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_PRIVATE_KEY} init.yml
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} init.yml
   when: delayed
   start_in: 2 minutes
