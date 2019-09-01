@@ -14,7 +14,7 @@ ci-image:ansible-openstack:
     - .docker
   script:
     - cd ansible-openstack
-    - docker build -t ${CI_REGISTRY_IMAGE}ansible-openstack .
+    - docker build -t ${CI_REGISTRY_IMAGE}/ansible-openstack .
     - docker push ${CI_REGISTRY_IMAGE}/ansible-openstack
   only:
     refs:
