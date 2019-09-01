@@ -1,5 +1,7 @@
 stages:
   - image:ci
+  - ansible:launch
+  - ansible:init
 
 .docker:
   image: docker:stable
@@ -20,6 +22,8 @@ ci-image:ansible-openstack:
     refs:
       - master
       - ci-image
+    changes:
+      - ansible-openstack/Dockerfile
   except:
     - schedules
 
@@ -34,3 +38,37 @@ ci-image:ansible-openstack:schedule-refresh:
     - docker push ${CI_REGISTRY_IMAGE}/ansible-openstack
   only:
     - schedules
+
+.ansible:
+  image: ${CI_REGISTRY_IMAGE}/ansible-openstack
+  variables:
+    ANSIBLE_LOAD_CALLBACK_PLUGINS: 1
+    ANSIBLE_STDOUT_CALLBACK: debug
+    ANSIBLE_HOST_KEY_CHECKING: 0
+  before_script:
+    - source project.sh
+    - source ${OS_IDENTITY_FILE}
+    - chmod 755 openstack_inventory.py
+    - chmod 600 ${K8S_PRIVATE_KEY}
+  only:
+    refs:
+      - master
+      - ansible
+  except:
+    - schedules
+
+launch:
+  stage: ansible:launch
+  extends:
+    - .ansible
+  script:
+    - ansible-playbook -i openstack_inventory.py -e public_key_path=${K8S_PUBLIC_KEY} launch.yml
+
+init:
+  stage: ansible:init
+  extends:
+    - .ansible
+  script:
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_PRIVATE_KEY} init.yml
+  when: delayed
+  start_in: 2 minutes
