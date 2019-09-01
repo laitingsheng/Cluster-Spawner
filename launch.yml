@@ -1,0 +1,123 @@
+- name: Remove instances
+  hosts: T_R-k8s-*
+  gather_facts: no
+  connection: local
+  strategy: free
+  tasks:
+    - name: Remove instance
+      os_server:
+        state: absent
+        name: "{{ inventory_hostname }}"
+
+- name: Remove previous resources
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Remove the keypair
+      os_keypair:
+        state: absent
+        name: T_R-k8s-key
+    - name: Create the keypair
+      os_keypair:
+        state: present
+        name: T_R-k8s-key
+        public_key_file: "{{ public_key_path }}"
+    - name: Remove security groups
+      os_security_group:
+        state: absent
+        name: "T_R-k8s-rules-{{ item }}"
+      with_items:
+        - master
+        - worker
+    - name: Create security groups
+      os_security_group:
+        state: present
+        name: "T_R-k8s-rules-{{ item }}"
+      with_items:
+        - master
+        - worker
+    # the following rules are defined according to https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+    - name: Add rules to master
+      os_security_group_rule:
+        state: present
+        security_group: T_R-k8s-rules-master
+        direction: ingress
+        ethertype: IPv4
+        protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+        port_range_min: "{{ item.min }}"
+        port_range_max: "{{ item.max }}"
+      with_items:
+        - { min: 2379, max: 2380 }
+        - { min: 6443, max: 6443 }
+        - { min: 10250, max: 10252 }
+    - name: Add rules to worker
+      os_security_group_rule:
+        state: present
+        security_group: T_R-k8s-rules-worker
+        direction: ingress
+        ethertype: IPv4
+        protocol: tcp
+        remote_ip_prefix: 0.0.0.0/0
+        port_range_min: "{{ item.min }}"
+        port_range_max: "{{ item.max }}"
+      with_items:
+        - { min: 10250, max: 10250 }
+        - { min: 30000, max: 32767 }
+
+- name: Create Kubernetes master on NeCTAR
+  hosts: localhost
+  gather_facts: no
+  vars:
+    availability_zone: melbourne-qh2
+    image: NeCTAR Ubuntu 18.04 LTS (Bionic) amd64
+    key_name: T_R-k8s-key
+  tasks:
+    - name: Launch Kubernetes Master
+      os_server:
+        state: present
+        name: T_R-k8s-master
+        availability_zone: "{{ availability_zone }}"
+        image: "{{ image }}"
+        flavor: m1.large
+        security_groups:
+          - default
+          - ssh
+          - T_R-k8s-rules-master
+        key_name: "{{ key_name }}"
+        timeout: 600
+      async: 600
+      poll: 0
+      register: master_launch_result
+    - name: Launch Kubernetes Workers
+      os_server:
+        state: present
+        name: "T_R-k8s-{{ item }}-worker"
+        availability_zone: "{{ availability_zone }}"
+        image: "{{ image }}"
+        flavor: m1.medium
+        security_groups:
+          - default
+          - ssh
+          - T_R-k8s-rules-worker
+        key_name: "{{ key_name }}"
+        timeout: 600
+      async: 600
+      poll: 0
+      with_sequence: start=1 count=5
+      register: workers_launch_results
+    - name: Wait for Kubernetes master
+      async_status:
+        jid: "{{ master_launch_result.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 5
+    - name: Wait for Kubernetes workers
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 5
+      loop: "{{ workers_launch_results.results }}"

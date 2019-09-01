@@ -1,0 +1,140 @@
+- name: Perform actions prior to initialisation
+  hosts: T_R-k8s-*
+  gather_facts: yes
+  become: yes
+  remote_user: ubuntu
+  strategy: free
+  tasks:
+    - name: Create two folders under /mnt and /var/lib for next step
+      file:
+        state: directory
+        path: "{{ item.name }}"
+        mode: "{{ item.mode }}"
+        owner: root
+        group: root
+      with_items:
+        - { name: "/mnt/var/lib/docker", mode: 711 }
+        - { name: "/mnt/var/lib/containerd", mode: 700 }
+        - { name: "/mnt/var/lib/kubelet", mode: 700 }
+        - { name: "/var/lib/docker", mode: 711 }
+        - { name: "/var/lib/containerd", mode: 700 }
+        - { name: "/var/lib/kubelet", mode: 700 }
+    - name: Bind folders to /var/lib to avoid inflating /var due to Docker
+      mount:
+        # only add to /etc/fstab without mounting
+        state: present
+        src: "{{ item.src }}"
+        path: "{{ item.path }}"
+        fstype: auto
+        opts: bind
+      with_items:
+        - { src: "/mnt/var/lib/docker", path: "/var/lib/docker" }
+        - { src: "/mnt/var/lib/containerd", path: "/var/lib/containerd" }
+        - { src: "/mnt/var/lib/kubelet", path: "/var/lib/kubelet" }
+    - name: Remove swapfile mount point
+      mount:
+        state: absent
+        path: none
+    - name: Reboot the server to apply all changes immediately
+      reboot:
+        reboot_timeout: 60
+
+- name: Initialise Kubernetes
+  hosts: T_R-k8s-*
+  gather_facts: yes
+  become: yes
+  remote_user: ubuntu
+  strategy: free
+  tasks:
+    - name: Install packages for HTTPS repositories
+      apt:
+        state: latest
+        name: "{{ packages }}"
+        update_cache: yes
+      vars:
+        packages:
+          - apt-transport-https
+          - curl
+    - name: Add repository keys before adding repositories
+      apt_key:
+        state: present
+        url: "{{ item }}"
+      with_items:
+        - "https://download.docker.com/linux/debian/gpg"
+        - "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+    - name: Add repositories
+      apt_repository:
+        state: present
+        repo: "{{ item.repo }}"
+        filename: "{{ item.name }}"
+      with_items:
+        - { name: "docker.list", repo: "deb https://download.docker.com/linux/ubuntu bionic stable" }
+        - { name: "google.list", repo: "deb https://apt.kubernetes.io kubernetes-xenial main" }
+    - name: Update the rest of packages
+      apt:
+        upgrade: full
+    - name: Install packages
+      apt:
+        state: latest
+        name: "{{ packages }}"
+      vars:
+        packages:
+          - gcc
+          - g++
+          - docker-ce
+          - kubelet
+          - kubeadm
+          - kubectl
+    - name: Append ubuntu to docker group
+      user:
+        state: present
+        name: ubuntu
+        append: yes
+        groups:
+          - docker
+
+- name: Initialise Kubernetes Master
+  hosts: T_R-k8s-master
+  gather_facts: yes
+  become: yes
+  remote_user: ubuntu
+  tasks:
+    - name: Reset maseter node
+      shell: kubeadm reset --force
+    - name: Initialise kubeadm with network driver Flannel
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16
+    - name: Create .kube under home folder
+      file:
+        state: directory
+        path: "~ubuntu/.kube"
+        mode: "755"
+        owner: ubuntu
+        group: ubuntu
+    - name: Copy system config to home folder
+      copy:
+        remote_src: yes
+        src: "/etc/kubernetes/admin.conf"
+        dest: "~ubuntu/.kube/config"
+        mode: "644"
+        owner: ubuntu
+        group: ubuntu
+    - name: Deploy a pod network to the cluster
+      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      become: no
+    - name: Fetch token
+      shell: kubeadm token create --print-join-command
+      register: k8s_join_command
+    - name: Add dummy host to hold the join command
+      add_host:
+        name: k8s-dummy-holder
+        command: "{{ k8s_join_command.stdout }}"
+
+- name: Initialise Kubernetes Workers
+  hosts: T_R-k8s-*-worker
+  gather_facts: yes
+  become: yes
+  remote_user: ubuntu
+  strategy: free
+  tasks:
+    - name: Join Kubernetes master
+      shell: "{{ hostvars['k8s-dummy-holder']['command'] }}"
