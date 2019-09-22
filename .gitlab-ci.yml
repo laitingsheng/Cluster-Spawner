@@ -55,6 +55,10 @@ ci-image:ansible-openstack:schedule-refresh:
     refs:
       - master
       - ansible
+    changes:
+      - launch.yml
+      - init.yml
+      - project.sh
   except:
     - schedules
 

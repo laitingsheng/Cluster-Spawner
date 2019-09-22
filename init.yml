@@ -79,12 +79,10 @@
         name: "{{ packages }}"
       vars:
         packages:
-          - gcc
-          - g++
-          - docker-ce
-          - kubelet
-          - kubeadm
-          - kubectl
+          - docker-ce=5:18.09.9~3-0~ubuntu-bionic
+          - kubelet=1.16.0-00
+          - kubeadm=1.16.0-00
+          - kubectl=1.16.0-00
     - name: Append ubuntu to docker group
       user:
         state: present
