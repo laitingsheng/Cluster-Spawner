@@ -75,7 +75,7 @@
         upgrade: full
     - name: Install packages
       apt:
-        state: latest
+        state: present
         name: "{{ packages }}"
       vars:
         packages:
@@ -83,6 +83,8 @@
           - kubelet=1.16.0-00
           - kubeadm=1.16.0-00
           - kubectl=1.16.0-00
+    - name: Withhold the packages version
+      shell: apt-mark hold docker-ce kubelet kubeadm kubectl
     - name: Append ubuntu to docker group
       user:
         state: present
