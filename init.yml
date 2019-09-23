@@ -89,7 +89,7 @@
       sysctl:
         name: net.bridge.bridge-nf-call-iptables
         value: "1"
-        state: present
+        state:
     - name: Append ubuntu to docker group
       user:
         state: present
@@ -124,7 +124,7 @@
         owner: ubuntu
         group: ubuntu
     - name: Deploy a pod network to the cluster
-      shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      shell: kubectl apply -f https://raw.githubusercontent.com/kellybirr/flannel/kellybirr-kube-1.16/Documentation/kube-flannel.yml
       become: no
     - name: Fetch token
       shell: kubeadm token create --print-join-command
