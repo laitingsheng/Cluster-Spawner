@@ -89,7 +89,7 @@
       sysctl:
         name: net.bridge.bridge-nf-call-iptables
         value: "1"
-        state:
+        state: present
     - name: Append ubuntu to docker group
       user:
         state: present
