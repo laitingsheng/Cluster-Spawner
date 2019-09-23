@@ -79,7 +79,7 @@
         name: "{{ packages }}"
       vars:
         packages:
-          - docker-ce=5:18.09.9~3-0~ubuntu-bionic
+          - docker-ce
           - kubelet=1.16.0-00
           - kubeadm=1.16.0-00
           - kubectl=1.16.0-00
