@@ -79,12 +79,17 @@
         name: "{{ packages }}"
       vars:
         packages:
-          - docker-ce
+          - docker-ce=5:18.09.9~3-0~ubuntu-bionic
           - kubelet=1.16.0-00
           - kubeadm=1.16.0-00
           - kubectl=1.16.0-00
     - name: Withhold the packages version
       shell: apt-mark hold docker-ce kubelet kubeadm kubectl
+    - name: Enable net.bridge.bridge-nf-call-iptables
+      sysctl:
+        name: net.bridge.bridge-nf-call-iptables
+        value: "1"
+        state: present
     - name: Append ubuntu to docker group
       user:
         state: present
