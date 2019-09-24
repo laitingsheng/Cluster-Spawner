@@ -79,7 +79,7 @@
         name: T_R-k8s-master
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.large
+        flavor: m1.xlarge
         security_groups:
           - default
           - ssh
@@ -95,7 +95,7 @@
         name: "T_R-k8s-{{ item }}-worker"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.medium
+        flavor: m1.large
         security_groups:
           - default
           - ssh
@@ -104,7 +104,7 @@
         timeout: 600
       async: 600
       poll: 0
-      with_sequence: start=1 count=3
+      with_sequence: start=1 count=5
       register: workers_launch_results
     - name: Wait for Kubernetes master
       async_status:
