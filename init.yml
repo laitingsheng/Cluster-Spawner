@@ -126,6 +126,9 @@
     - name: Deploy a pod network to the cluster
       shell: kubectl apply -f https://raw.githubusercontent.com/kellybirr/flannel/kellybirr-kube-1.16/Documentation/kube-flannel.yml
       become: no
+    - name: Add KUBECONFIG
+      environment:
+        KUBECONFIG: "~ubuntu/.kube/config"
     - name: Add secret key for private custom scheduler
       shell: "kubectl create secret docker-registry custom-scheduler-registry-secret --docker-server={{ k8s_scheduler_registry }} --docker-username={{ k8s_scheduler_registry_username }} --docker-password={{ k8s_scheduler_registry_password }}"
     - name: Fetch token
