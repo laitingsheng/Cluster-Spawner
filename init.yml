@@ -1,5 +1,5 @@
 - name: Perform actions prior to initialisation
-  hosts: T_R-k8s-*
+  hosts: T_R-k8s-master
   gather_facts: yes
   become: yes
   remote_user: ubuntu
@@ -31,6 +31,13 @@
         - { src: "/mnt/var/lib/docker", path: "/var/lib/docker" }
         - { src: "/mnt/var/lib/containerd", path: "/var/lib/containerd" }
         - { src: "/mnt/var/lib/kubelet", path: "/var/lib/kubelet" }
+- name: Perform actions prior to initialisation
+  hosts: T_R-k8s-*
+  gather_facts: yes
+  become: yes
+  remote_user: ubuntu
+  strategy: free
+  tasks:
     - name: Remove swapfile mount point
       mount:
         state: absent
@@ -79,10 +86,10 @@
         name: "{{ packages }}"
       vars:
         packages:
-          - docker-ce=5:18.09.9~3-0~ubuntu-bionic
-          - kubelet=1.16.0-00
-          - kubeadm=1.16.0-00
-          - kubectl=1.16.0-00
+          - docker-ce
+          - kubelet=1.16.1-00
+          - kubeadm=1.16.1-00
+          - kubectl=1.16.1-00
     - name: Withhold the packages version
       shell: apt-mark hold docker-ce kubelet kubeadm kubectl
     - name: Enable net.bridge.bridge-nf-call-iptables
@@ -139,11 +146,10 @@
         command: "{{ k8s_join_command.stdout }}"
 
 - name: Initialise Kubernetes Workers
-  hosts: T_R-k8s-*-worker
+  hosts: T_R-k8s-worker
   gather_facts: yes
   become: yes
   remote_user: ubuntu
-  strategy: free
   tasks:
     - name: Join Kubernetes master
       shell: "{{ hostvars['k8s-dummy-holder']['command'] }}"

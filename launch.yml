@@ -79,7 +79,7 @@
         name: T_R-k8s-master
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.xlarge
+        flavor: m1.large
         security_groups:
           - default
           - ssh
@@ -89,13 +89,13 @@
       async: 600
       poll: 0
       register: master_launch_result
-    - name: Launch Kubernetes Workers
+    - name: Launch Kubernetes Worker
       os_server:
         state: present
-        name: "T_R-k8s-{{ item }}-worker"
+        name: "T_R-k8s-worker"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.large
+        flavor: m2.small
         security_groups:
           - default
           - ssh
@@ -104,8 +104,7 @@
         timeout: 600
       async: 600
       poll: 0
-      with_sequence: start=1 count=4
-      register: workers_launch_results
+      register: worker_launch_result
     - name: Wait for Kubernetes master
       async_status:
         jid: "{{ master_launch_result.ansible_job_id }}"
@@ -113,11 +112,10 @@
       until: job_result.finished
       retries: 120
       delay: 5
-    - name: Wait for Kubernetes workers
+    - name: Wait for Kubernetes worker
       async_status:
-        jid: "{{ item.ansible_job_id }}"
+        jid: "{{ worker_launch_result.ansible_job_id }}"
       register: job_result
       until: job_result.finished
       retries: 120
       delay: 5
-      loop: "{{ workers_launch_results.results }}"
