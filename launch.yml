@@ -92,7 +92,7 @@
     - name: Launch Kubernetes Worker
       os_server:
         state: present
-        name: "T_R-k8s-worker-{{ ansible_date_time.date }}"
+        name: "T_R-k8s-worker-{{ ansible_date_time.iso8601_basic_short }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
         flavor: m2.small
