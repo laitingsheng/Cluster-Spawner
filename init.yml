@@ -137,8 +137,8 @@
         name: k8s-dummy-holder
         command: "{{ k8s_join_command.stdout }}"
 
-- name: Initialise Kubernetes Workers
-  hosts: T_R-k8s-worker-*
+- name: Initialise Kubernetes Minions
+  hosts: T_R-k8s-minion-*
   gather_facts: yes
   become: yes
   remote_user: ubuntu

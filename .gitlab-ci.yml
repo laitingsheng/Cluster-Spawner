@@ -1,46 +1,9 @@
 stages:
-  - image:ci
   - ansible:launch
   - ansible:init
 
-.docker:
-  image: docker:stable
-  services:
-    - docker:dind
-  before_script:
-    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-
-ci-image:ansible-openstack:
-  stage: image:ci
-  extends:
-    - .docker
-  script:
-    - cd ansible-openstack
-    - docker build -t ${CI_REGISTRY_IMAGE}/ansible-openstack .
-    - docker push ${CI_REGISTRY_IMAGE}/ansible-openstack
-  only:
-    refs:
-      - master
-      - ci-image
-    changes:
-      - ansible-openstack/Dockerfile
-  except:
-    - schedules
-
-ci-image:ansible-openstack:schedule-refresh:
-  stage: image:ci
-  extends:
-    - .docker
-  script:
-    - docker pull ${CI_REGISTRY_IMAGE}/ansible-openstack
-    - cd ansible-openstack
-    - docker build --cache-from ${CI_REGISTRY_IMAGE}/ansible-openstack -t ${CI_REGISTRY_IMAGE}/ansible-openstack .
-    - docker push ${CI_REGISTRY_IMAGE}/ansible-openstack
-  only:
-    - schedules
-
 .ansible:
-  image: ${CI_REGISTRY_IMAGE}/ansible-openstack
+  image: registry.gitlab.com/laitingsheng/docker-ansible:latest
   variables:
     ANSIBLE_LOAD_CALLBACK_PLUGINS: 1
     ANSIBLE_STDOUT_CALLBACK: debug

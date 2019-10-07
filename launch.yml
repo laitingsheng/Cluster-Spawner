@@ -28,14 +28,14 @@
         name: "T_R-k8s-rules-{{ item }}"
       with_items:
         - master
-        - worker
+        - minion
     - name: Create security groups
       os_security_group:
         state: present
         name: "T_R-k8s-rules-{{ item }}"
       with_items:
         - master
-        - worker
+        - minion
     # the following rules are defined according to https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
     - name: Add rules to master
       os_security_group_rule:
@@ -51,10 +51,10 @@
         - { min: 2379, max: 2380 }
         - { min: 6443, max: 6443 }
         - { min: 10250, max: 10252 }
-    - name: Add rules to worker
+    - name: Add rules to minions
       os_security_group_rule:
         state: present
-        security_group: T_R-k8s-rules-worker
+        security_group: T_R-k8s-rules-minion
         direction: ingress
         ethertype: IPv4
         protocol: tcp
@@ -89,22 +89,22 @@
       async: 600
       poll: 0
       register: master_launch_result
-    - name: Launch Kubernetes Worker
+    - name: Launch Kubernetes Minion
       os_server:
         state: present
-        name: "T_R-k8s-worker-{{ ansible_date_time.iso8601_basic_short }}"
+        name: "T_R-k8s-minion-{{ ansible_date_time.iso8601_basic_short }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
         flavor: m2.small
         security_groups:
           - default
           - ssh
-          - T_R-k8s-rules-worker
+          - T_R-k8s-rules-minion
         key_name: "{{ key_name }}"
         timeout: 600
       async: 600
       poll: 0
-      register: worker_launch_result
+      register: minion_launch_result
     - name: Wait for Kubernetes master
       async_status:
         jid: "{{ master_launch_result.ansible_job_id }}"
@@ -112,9 +112,9 @@
       until: job_result.finished
       retries: 120
       delay: 5
-    - name: Wait for Kubernetes worker
+    - name: Wait for Kubernetes minion
       async_status:
-        jid: "{{ worker_launch_result.ansible_job_id }}"
+        jid: "{{ minion_launch_result.ansible_job_id }}"
       register: job_result
       until: job_result.finished
       retries: 120
