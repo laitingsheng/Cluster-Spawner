@@ -145,19 +145,3 @@
   tasks:
     - name: Join Kubernetes master
       shell: "{{ hostvars['k8s-dummy-holder']['command'] }}"
-
-- name: Deploy scheduler
-  hosts: T_R-k8s-master
-  gather_facts: yes
-  become: no
-  remote_user: ubuntu
-  tasks:
-    - name: Copy deployment file to remote
-      copy:
-        src: "./scheduler.yml"
-        dest: "~ubuntu/deploy.yml"
-        mode: "644"
-        owner: ubuntu
-        group: ubuntu
-    - name: Deploy Scheduler
-      shell: kubectl apply -f ~ubuntu/deploy.yml
