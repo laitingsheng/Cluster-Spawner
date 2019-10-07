@@ -67,7 +67,7 @@
 
 - name: Create Kubernetes master on NeCTAR
   hosts: localhost
-  gather_facts: no
+  gather_facts: yes
   vars:
     availability_zone: melbourne-qh2
     image: NeCTAR Ubuntu 18.04 LTS (Bionic) amd64
