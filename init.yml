@@ -129,15 +129,6 @@
       shell: "kubectl -n kube-system create secret docker-registry custom-scheduler-registry-secret --docker-server={{ k8s_scheduler_registry }} --docker-username={{ k8s_scheduler_registry_username }} --docker-password={{ k8s_scheduler_registry_password }}"
       environment:
         KUBECONFIG: "/etc/kubernetes/admin.conf"
-    - name: Copy deployment file to remote
-      copy:
-        src: "./custom-scheduler.yml"
-        path: "~ubuntu/deploy.yml"
-        mode: "644"
-        owner: ubuntu
-        group: ubuntu
-    - name: Deploy Scheduler
-      shell: kubectl create -f ~ubuntu/deploy.yml
     - name: Fetch token
       shell: kubeadm token create --print-join-command
       register: k8s_join_command

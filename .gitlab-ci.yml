@@ -2,6 +2,7 @@ stages:
   - image:ci
   - ansible:launch
   - ansible:init
+  - scheduler:deploy
 
 .docker:
   image: docker:stable
@@ -77,3 +78,10 @@ init:
     - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} -e k8s_scheduler_registry=${K8S_SCHEDULER_REGISTRY} -e k8s_scheduler_registry_username=${K8S_SCHEDULER_REGISTRY_USERNAME} -e k8s_scheduler_registry_password=${K8S_SCHEDULER_REGISTRY_PASSWORD} init.yml
   when: delayed
   start_in: 2 minutes
+
+deploy:
+  stage: scheduler:deploy
+  extends:
+    - .ansible
+  script:
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} deploy.yml
