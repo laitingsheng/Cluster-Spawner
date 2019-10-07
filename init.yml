@@ -138,7 +138,7 @@
         command: "{{ k8s_join_command.stdout }}"
 
 - name: Initialise Kubernetes Workers
-  hosts: T_R-k8s-worker
+  hosts: T_R-k8s-worker-*
   gather_facts: yes
   become: yes
   remote_user: ubuntu
