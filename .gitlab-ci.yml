@@ -3,7 +3,7 @@ stages:
   - ansible:init
 
 .ansible:
-  image: registry.gitlab.com/laitingsheng/docker-ansible:latest
+  image: registry.gitlab.com/laitingsheng/docker-ubuntu:ansible
   variables:
     ANSIBLE_LOAD_CALLBACK_PLUGINS: 1
     ANSIBLE_STDOUT_CALLBACK: debug
