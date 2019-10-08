@@ -1,5 +1,5 @@
 - name: Perform actions prior to initialisation
-  hosts: T_R-k8s-master
+  hosts: T_R-k8s-*
   gather_facts: yes
   become: yes
   remote_user: ubuntu
@@ -31,13 +31,6 @@
         - { src: "/mnt/var/lib/docker", path: "/var/lib/docker" }
         - { src: "/mnt/var/lib/containerd", path: "/var/lib/containerd" }
         - { src: "/mnt/var/lib/kubelet", path: "/var/lib/kubelet" }
-- name: Initialise Kubernetes
-  hosts: T_R-k8s-*
-  gather_facts: yes
-  become: yes
-  remote_user: ubuntu
-  strategy: free
-  tasks:
     - name: Remove swapfile mount point
       mount:
         state: absent

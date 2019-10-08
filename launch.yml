@@ -92,10 +92,10 @@
     - name: Launch Kubernetes Minion
       os_server:
         state: present
-        name: "T_R-k8s-minion-{{ ansible_date_time.iso8601_basic_short }}"
+        name: "T_R-k8s-minion-{{ item[0] }}-{{ item[1] }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m2.small
+        flavor: "m1.{{ item[0] }}"
         security_groups:
           - default
           - ssh
@@ -104,7 +104,10 @@
         timeout: 600
       async: 600
       poll: 0
-      register: minion_launch_result
+      with_nested:
+        - [ 'small', 'medium' ]
+        - "{{ lookup('sequence', 'start=1 count=4') | select('match', '\\d+') | list }}"
+      register: minions_launch_result
     - name: Wait for Kubernetes master
       async_status:
         jid: "{{ master_launch_result.ansible_job_id }}"
@@ -114,8 +117,9 @@
       delay: 5
     - name: Wait for Kubernetes minion
       async_status:
-        jid: "{{ minion_launch_result.ansible_job_id }}"
+        jid: "{{ item.ansible_job_id }}"
       register: job_result
       until: job_result.finished
       retries: 120
       delay: 5
+      loop: "{{ minions_launch_results.results }}"
