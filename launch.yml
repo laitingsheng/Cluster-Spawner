@@ -107,7 +107,7 @@
       with_nested:
         - [ 'small', 'medium' ]
         - "{{ lookup('sequence', 'start=1 count=4') | select('match', '\\d+') | list }}"
-      register: minions_launch_result
+      register: minions_launch_results
     - name: Wait for Kubernetes master
       async_status:
         jid: "{{ master_launch_result.ansible_job_id }}"
