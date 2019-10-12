@@ -8,9 +8,21 @@
       copy:
         src: "manifests"
         dest: "~/"
+        
     - name: Apply manifests
       shell: kubectl apply -f ~/manifests/
-    - pause:
-        seconds: 5
+      ignore_errors: yes
+      register: out
+    - debug: msg={{out.stdout}}
+
+    - name: Wait until all yaml files is applied
+      shell: until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+
+    - name: Wait for servicemonitors
+      shell: until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+
     - name: Apply Prometheus deployment set for the second time to resolve async error
       shell: kubectl apply -f ~/manifests/
+      ignore_errors: yes
+      register: out
+    - debug: msg={{out.stdout}}
