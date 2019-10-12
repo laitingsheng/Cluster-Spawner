@@ -56,6 +56,7 @@ monitoring:
   extends:
     - .deploy
   script:
+    - cat ~/.kube/config
     - kubectl apply -f manifests/ || true
     - until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
     - until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
