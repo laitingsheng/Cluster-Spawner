@@ -11,9 +11,9 @@ stages:
     ANSIBLE_HOST_KEY_CHECKING: 0
   before_script:
     - source project.sh
-    - source ${OS_IDENTITY_FILE}
+    - source $OS_IDENTITY_FILE
     - chmod 755 openstack_inventory.py
-    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
+    - chmod 600 $K8S_MASTER_PRIVATE_KEY
   only:
     refs:
       - master
@@ -29,14 +29,14 @@ launch:
   extends:
     - .ansible
   script:
-    - ansible-playbook -i openstack_inventory.py -e public_key_path=${K8S_MASTER_PUBLIC_KEY} launch.yml
+    - ansible-playbook -i openstack_inventory.py -e public_key_path=$K8S_MASTER_PUBLIC_KEY launch.yml
 
 init:
   stage: init
   extends:
     - .ansible
   script:
-    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} -e k8s_scheduler_registry=${K8S_SCHEDULER_REGISTRY} -e k8s_scheduler_registry_username=${K8S_SCHEDULER_REGISTRY_USERNAME} -e k8s_scheduler_registry_password=${K8S_SCHEDULER_REGISTRY_PASSWORD} init.yml
+    - ansible-playbook -i openstack_inventory.py --private-key $K8S_MASTER_PRIVATE_KEY -e k8s_scheduler_registry=$K8S_SCHEDULER_REGISTRY -e k8s_scheduler_registry_username=$K8S_SCHEDULER_REGISTRY_USERNAME -e k8s_scheduler_registry_password=$K8S_SCHEDULER_REGISTRY_PASSWORD init.yml
   when: delayed
   start_in: 2 minutes
 
@@ -46,11 +46,11 @@ init:
     - .ansible
   before_script:
     - source project.sh
-    - source ${OS_IDENTITY_FILE}
+    - source $OS_IDENTITY_FILE
     - chmod 755 openstack_inventory.py
-    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
+    - chmod 600 $K8S_MASTER_PRIVATE_KEY
     - mkdir -p ~/.kube
-    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} fetch.yml
+    - python openstack_inventory.py --host T_R-k8s-master | grep accessIPv4 | awk -F' ' '{print $2}' | awk '{gsub(/[",]/, "")} 1' | xargs -i bash -c "scp -i $K8S_MASTER_PRIVATE_KEY ubuntu@{}:.kube/config ~/.kube/config"
 
 monitoring:
   extends:
@@ -67,7 +67,6 @@ monitoring:
       - launch.yml
       - init.yml
       - project.sh
-      - fetch.yml
       - monitoring/*
   except:
     - schedules
@@ -84,7 +83,6 @@ scheduler:
       - launch.yml
       - init.yml
       - project.sh
-      - fetch.yml
       - scheduler/*
   except:
     - schedules
