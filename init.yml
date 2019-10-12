@@ -153,6 +153,7 @@
 
     - name: Apply Prometheus deployment set
       shell: kubectl apply -f ~/manifests/
+      become: no
       ignore_errors: yes
       register: out
     - debug: msg={{out.stdout}}
@@ -166,5 +167,6 @@
 
     - name: Apply Prometheus deployment set for the second time to resolve async error
       shell: kubectl apply -f ~/manifests/
+      become: no
       register: out
     - debug: msg={{out.stdout}}
