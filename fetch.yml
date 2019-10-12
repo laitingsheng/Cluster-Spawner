@@ -3,9 +3,8 @@
   gather_facts: no
   become: no
   remote_user: ubuntu
-  strategy: free
   tasks:
     - name: Fetch ~/.kube/config
       fetch:
         src: "~/.kube/config"
-        dest: "~/.kube/config"
+        dest: "~/.kube/"
