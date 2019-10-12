@@ -84,6 +84,7 @@
           - default
           - ssh
           - T_R-k8s-rules-master
+          - T_R-k8s-rules-minion
         key_name: "{{ key_name }}"
         timeout: 600
       async: 600
