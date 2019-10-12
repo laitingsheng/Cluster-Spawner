@@ -30,9 +30,7 @@ spec:
   containers:
   - command:
     - kube-scheduler
-    - --bind-address=127.0.0.1
-    - --leader-elect=true
-    - --scheduler-name=custom-scheduler
+    - --config=/scheduler-config.yml
     image: registry.gitlab.com/research-project-group/scheduler-plugin/custom-kube-scheduler:latest
     imagePullPolicy: IfNotPresent
     livenessProbe:
@@ -47,7 +45,7 @@ spec:
     name: custom-kube-scheduler
     resources:
       requests:
-        cpu: 1000m
+        cpu: 100m
   imagePullSecrets:
   - name: custom-scheduler-registry-secret
   hostNetwork: true
