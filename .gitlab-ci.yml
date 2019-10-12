@@ -40,25 +40,11 @@ init:
   when: delayed
   start_in: 2 minutes
 
-.deploy:
-  stage: deploy
-  extends:
-    - .ansible
-  before_script:
-    - source project.sh
-    - source ${OS_IDENTITY_FILE}
-    - chmod 755 openstack_inventory.py
-    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
-    - mkdir -p ~/.kube
-    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} fetch.yml
-
 monitoring:
   extends:
-    - .deploy
+    - .ansible
   script:
-    - kubectl apply -f manifests/
-    - sleep 5
-    - kubectl apply -f manifests/
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} monitoring.yml
   only:
     refs:
       - master
@@ -66,7 +52,7 @@ monitoring:
       - launch.yml
       - init.yml
       - project.sh
-      - fetch.yml
+      - monitoring.yml
       - manifests/*
   except:
     - schedules
