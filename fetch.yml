@@ -7,4 +7,4 @@
     - name: Fetch ~/.kube/config
       fetch:
         src: "~/.kube/config"
-        dest: "~/.kube/config"
+        dest: "~/.kube/"
