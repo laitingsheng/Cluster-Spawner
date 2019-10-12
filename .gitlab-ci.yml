@@ -71,3 +71,20 @@ monitoring:
       - monitoring/*
   except:
     - schedules
+
+scheduler:
+  extends:
+    - .deploy
+  script:
+    - kubectl apply -f scheduler/
+  only:
+    refs:
+      - master
+    changes:
+      - launch.yml
+      - init.yml
+      - project.sh
+      - fetch.yml
+      - scheduler/*
+  except:
+    - schedules
