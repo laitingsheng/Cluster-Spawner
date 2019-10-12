@@ -95,6 +95,7 @@
   gather_facts: yes
   become: yes
   remote_user: ubuntu
+  strategy: free
   tasks:
     - name: Reset maseter node
       shell: kubeadm reset --force
@@ -134,39 +135,7 @@
   gather_facts: yes
   become: yes
   remote_user: ubuntu
+  strategy: free
   tasks:
     - name: Join Kubernetes master
       shell: "{{ hostvars['k8s-dummy-holder']['command'] }}"
-
-- name: Apply Prometheus Monitoring step
-  hosts: T_R-k8s-master
-  gather_facts: yes
-  become: yes
-  remote_user: ubuntu
-  tasks:
-    - name: copy Prometheus deployment set to master machine
-      copy:
-        src: manifests
-        dest: ~ubuntu/manifests/
-      register: out
-    - debug: msg={{out.stdout}}
-
-    - name: Apply Prometheus deployment set
-      shell: kubectl apply -f ~/manifests/
-      become: no
-      ignore_errors: yes
-      register: out
-    - debug: msg={{out.stdout}}
-
-    - name: Wait until all yaml files is applied
-      shell: until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
-
-    - name: Wait for servicemonitors
-      shell: until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
-
-
-    - name: Apply Prometheus deployment set for the second time to resolve async error
-      shell: kubectl apply -f ~/manifests/
-      become: no
-      register: out
-    - debug: msg={{out.stdout}}

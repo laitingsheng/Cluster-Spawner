@@ -1,9 +1,10 @@
 stages:
-  - ansible:launch
-  - ansible:init
+  - launch
+  - init
+  - deploy
 
 .ansible:
-  image: registry.gitlab.com/laitingsheng/docker-ubuntu:ansible
+  image: registry.gitlab.com/laitingsheng/docker-ubuntu:k8s
   variables:
     ANSIBLE_LOAD_CALLBACK_PLUGINS: 1
     ANSIBLE_STDOUT_CALLBACK: debug
@@ -17,7 +18,6 @@ stages:
   only:
     refs:
       - master
-      - ansible
     changes:
       - launch.yml
       - init.yml
@@ -26,17 +26,46 @@ stages:
     - schedules
 
 launch:
-  stage: ansible:launch
+  stage: launch
   extends:
     - .ansible
   script:
     - ansible-playbook -i openstack_inventory.py -e public_key_path=${K8S_MASTER_PUBLIC_KEY} launch.yml
 
 init:
-  stage: ansible:init
+  stage: init
   extends:
     - .ansible
   script:
     - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} -e k8s_scheduler_registry=${K8S_SCHEDULER_REGISTRY} -e k8s_scheduler_registry_username=${K8S_SCHEDULER_REGISTRY_USERNAME} -e k8s_scheduler_registry_password=${K8S_SCHEDULER_REGISTRY_PASSWORD} init.yml
   when: delayed
   start_in: 2 minutes
+
+.deploy:
+  stage: deploy
+  extends:
+    - .ansible
+  before_script:
+    - source project.sh
+    - source ${OS_IDENTITY_FILE}
+    - wget https://raw.githubusercontent.com/ansible/ansible/devel/contrib/inventory/openstack_inventory.py
+    - chmod 755 openstack_inventory.py
+    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
+    - mkdir -p ~/.kube
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} fetch.yml
+
+monitoring:
+  extends:
+    - .deploy
+  script:
+    - kubectl apply -f manifests/
+    - sleep 5
+    - kubectl apply -f manifests/
+  only:
+    refs:
+      - master
+    changes:
+      - fetch.yml
+      - manifests/*
+  except:
+    - schedules
