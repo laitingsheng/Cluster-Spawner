@@ -146,20 +146,25 @@
   tasks:
     - name: copy Prometheus deployment set to master machine
       copy:
-        src: ./manifest
-        dest: ~ubuntu/manifest/
+        src: manifests
+        dest: ~ubuntu/manifests/
       register: out
     - debug: msg={{out.stdout}}
 
     - name: Apply Prometheus deployment set
-      shell: kubectl apply -f ~ubuntu/manifest/
+      shell: kubectl apply -f ~/manifests/
       ignore_errors: yes
       register: out
     - debug: msg={{out.stdout}}
 
-    - pause: seconds=5
+    - name: Wait until all yaml files is applied
+      shell: until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+
+    - name: Wait for servicemonitors
+      shell: until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+
 
     - name: Apply Prometheus deployment set for the second time to resolve async error
-      shell: kubectl apply -f ~ubuntu/manifest/
+      shell: kubectl apply -f ~/manifests/
       register: out
     - debug: msg={{out.stdout}}
