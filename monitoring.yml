@@ -7,7 +7,7 @@
     - name: Upload manifests
       copy:
         src: "manifests"
-        dest: "~/manifests/"
+        dest: "~/"
     - name: Apply manifests
       shell: kubectl apply -f ~/manifests/
     - pause:
