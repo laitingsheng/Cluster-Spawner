@@ -11,7 +11,7 @@
         mode: "755"
     - name: Upload manifests
       synchronize:
-        src: "manifests"
+        src: "manifests/"
         dest: "~/manifests"
         archive: yes
         delete: yes
