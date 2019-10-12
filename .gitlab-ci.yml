@@ -50,7 +50,7 @@ init:
     - chmod 755 openstack_inventory.py
     - chmod 600 $K8S_MASTER_PRIVATE_KEY
     - mkdir -p ~/.kube
-    - python openstack_inventory.py --host T_R-k8s-master | grep accessIPv4 | awk -F' ' '{print $2}' | awk '{gsub(/[",]/, "")} 1' | xargs -i bash -c "scp -i $K8S_MASTER_PRIVATE_KEY ubuntu@{}:.kube/config ~/.kube/config"
+    - python openstack_inventory.py --host T_R-k8s-master | grep accessIPv4 | awk -F' ' '{print $2}' | awk '{gsub(/[",]/, "")} 1' | xargs -i bash -c "scp -i $K8S_MASTER_PRIVATE_KEY -o 'StrictHostKeyChecking=no' -o 'UserKnownHostsFile=/dev/null' ubuntu@{}:.kube/config ~/.kube/config"
 
 monitoring:
   extends:
