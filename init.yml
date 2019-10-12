@@ -95,7 +95,6 @@
   gather_facts: yes
   become: yes
   remote_user: ubuntu
-  strategy: free
   tasks:
     - name: Reset maseter node
       shell: kubeadm reset --force
