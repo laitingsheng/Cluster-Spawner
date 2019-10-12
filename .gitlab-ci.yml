@@ -41,6 +41,7 @@ init:
   start_in: 2 minutes
 
 monitoring:
+  stage: deploy
   extends:
     - .ansible
   script:
