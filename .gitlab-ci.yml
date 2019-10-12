@@ -40,13 +40,26 @@ init:
   when: delayed
   start_in: 2 minutes
 
-monitoring:
+.deploy:
   stage: deploy
   extends:
     - .ansible
+  before_script:
+    - source project.sh
+    - source ${OS_IDENTITY_FILE}
+    - chmod 755 openstack_inventory.py
+    - chmod 600 ${K8S_MASTER_PRIVATE_KEY}
+    - mkdir -p ~/.kube
+    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} fetch.yml
+
+monitoring:
+  extends:
+    - .deploy
   script:
-    - chmod -R go-w manifests
-    - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} monitoring.yml
+    - kubectl apply -f manifests/ || true
+    - until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
+    - until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done
+    - kubectl apply -f manifests/
   only:
     refs:
       - master
@@ -54,7 +67,7 @@ monitoring:
       - launch.yml
       - init.yml
       - project.sh
-      - monitoring.yml
+      - fetch.yml
       - manifests/*
   except:
     - schedules
