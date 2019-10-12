@@ -4,11 +4,6 @@
   become: no
   remote_user: ubuntu
   tasks:
-    - name: Create directory if not exists
-      file:
-        state: directory
-        path: "~/manifests"
-        mode: "755"
     - name: Upload manifests
       synchronize:
         src: "manifests/"
@@ -18,7 +13,7 @@
     - name: Apply manifests
       shell: kubectl apply -f ~/manifests/
       ignore_errors: yes
-    - name: Wait until all yaml files is applied
+    - name: Wait until all yaml files are applied
       shell: until kubectl get customresourcedefinitions servicemonitors.monitoring.coreos.com ; do date; sleep 1; echo ""; done
     - name: Wait for servicemonitors
       shell: until kubectl get servicemonitors --all-namespaces ; do date; sleep 1; echo ""; done

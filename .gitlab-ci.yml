@@ -45,6 +45,7 @@ monitoring:
   extends:
     - .ansible
   script:
+    - chmod -R go-w manifests
     - ansible-playbook -i openstack_inventory.py --private-key ${K8S_MASTER_PRIVATE_KEY} monitoring.yml
   only:
     refs:
