@@ -117,12 +117,13 @@
         group: ubuntu
     - name: Deploy a pod network to the cluster
       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+      become: no
     - name: Add secret key for private custom scheduler
       shell: "kubectl -n kube-system create secret docker-registry custom-scheduler-registry-secret --docker-server={{ k8s_scheduler_registry }} --docker-username={{ k8s_scheduler_registry_username }} --docker-password={{ k8s_scheduler_registry_password }}"
-      environment:
-        KUBECONFIG: "/etc/kubernetes/admin.conf"
+      become: no
     - name: Deploy Prometheus
       shell: "kubectl apply --kustomize github.com/kubernetes/ingress-nginx/deploy/prometheus/"
+      become: no
     - name: Fetch token
       shell: kubeadm token create --print-join-command
       register: k8s_join_command
