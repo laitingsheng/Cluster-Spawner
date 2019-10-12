@@ -70,6 +70,5 @@ monitoring:
       - project.sh
       - fetch.yml
       - manifests/*
-      - .gitlab-ci.yml
   except:
     - schedules

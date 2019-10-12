@@ -8,3 +8,4 @@
       fetch:
         src: "~/.kube/config"
         dest: "~/.kube/"
+        flat: yes
