@@ -10,6 +10,7 @@
         dest: "~/manifests/"
     - name: Apply manifests
       shell: kubectl apply -f ~/manifests/
-    - pause: 5
+    - pause:
+        seconds: 5
     - name: Apply Prometheus deployment set for the second time to resolve async error
       shell: kubectl apply -f ~/manifests/
