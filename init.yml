@@ -96,6 +96,10 @@
   become: yes
   remote_user: ubuntu
   tasks:
+    - name: Reset maseter node
+      shell: kubeadm reset --force
+    - name: Initialise kubeadm with network driver Flannel
+      shell: kubeadm init --pod-network-cidr=10.244.0.0/16
     - name: Create .kube under home folder
       file:
         state: directory
@@ -111,10 +115,6 @@
         mode: "644"
         owner: ubuntu
         group: ubuntu
-    - name: Reset maseter node
-      shell: kubeadm reset --force
-    - name: Initialise kubeadm with network driver Flannel
-      shell: kubeadm init --pod-network-cidr=10.244.0.0/16
     - name: Deploy a pod network to the cluster
       shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
       become: no
