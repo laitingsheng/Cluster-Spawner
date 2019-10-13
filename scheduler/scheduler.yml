@@ -30,8 +30,10 @@ spec:
   containers:
   - command:
     - kube-scheduler
+    - --bind-address=127.0.0.1
     - --config=/usr/local/lib/kube-scheduler/config.yml
-    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:e4ab1508
+    - --leader-elect=true
+    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:563c0263
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
@@ -46,6 +48,11 @@ spec:
     resources:
       requests:
         cpu: 100m
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      effect: "NoSchedule"
+      operator: "Exists"
+  nodeName: t-r-k8s-master
   imagePullSecrets:
   - name: custom-scheduler-registry-secret
   hostNetwork: true

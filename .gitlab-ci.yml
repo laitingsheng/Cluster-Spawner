@@ -66,6 +66,7 @@ prepare:
       - init.yml
       - project.sh
       - prepare.sh
+      - kube-scheduler-role.yml
   except:
     - schedules
 
