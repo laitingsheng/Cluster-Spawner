@@ -135,3 +135,14 @@
   tasks:
     - name: Join Kubernetes master
       shell: "{{ hostvars['k8s-dummy-holder']['command'] }}"
+
+- name: Shutdown all minions except service
+  hosts: T_R-k8s-minion-*-*
+  gather_facts: no
+  connection: local
+  strategy: free
+  tasks:
+    - name: Remove instance
+      os_server_action:
+        action: stop
+        name: "{{ inventory_hostname }}"
