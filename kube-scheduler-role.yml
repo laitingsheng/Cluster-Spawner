@@ -1,138 +1,131 @@
-# Please edit the object below. Lines beginning with a '#' will be ignored,
-# and an empty file will abort the edit. If an error occurs while saving this file will be
-# reopened with the relevant failures.
-#
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
-  creationTimestamp: "2019-10-13T10:07:47Z"
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-  name: system:kube-scheduler
-  resourceVersion: "5464"
-  selfLink: /apis/rbac.authorization.k8s.io/v1/clusterroles/system%3Akube-scheduler
-  uid: 36baaa70-2692-48b3-9b07-6b5b6378926c
-rules:
-- apiGroups:
-  - ""
-  - events.k8s.io
-  resources:
-  - events
-  verbs:
-  - create
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resourceNames:
-  - kube-scheduler
-  resources:
-  - endpoints
-  verbs:
-  - delete
-  - get
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - delete
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - bindings
-  - pods/binding
-  verbs:
-  - create
-- apiGroups:
-  - ""
-  resources:
-  - pods/status
-  verbs:
-  - patch
-  - update
-- apiGroups:
-  - ""
-  resources:
-  - replicationcontrollers
-  - services
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  - extensions
-  resources:
-  - replicasets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - apps
-  resources:
-  - statefulsets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - policy
-  resources:
-  - poddisruptionbudgets
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - persistentvolumeclaims
-  - persistentvolumes
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - authentication.k8s.io
-  resources:
-  - tokenreviews
-  verbs:
-  - create
-- apiGroups:
-  - authorization.k8s.io
-  resources:
-  - subjectaccessreviews
-  verbs:
-  - create
-- apiGroups:
-  - storage.k8s.io
-  resources:
-  - csinodes
-  - storageclasses
-  verbs:
-  - get
-  - list
-  - watch
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: ClusterRole
+  metadata:
+    annotations:
+      rbac.authorization.kubernetes.io/autoupdate: "true"
+    creationTimestamp: null
+    labels:
+      kubernetes.io/bootstrapping: rbac-defaults
+    name: system:kube-scheduler
+  rules:
+    - apiGroups:
+        - ""
+        - events.k8s.io
+      resources:
+        - events
+      verbs:
+        - create
+        - patch
+        - update
+    - apiGroups:
+        - ""
+      resources:
+        - endpoints
+      verbs:
+        - create
+    - apiGroups:
+        - ""
+      resourceNames:
+        - kube-scheduler
+      resources:
+        - endpoints
+      verbs:
+        - delete
+        - get
+        - patch
+        - update
+    - apiGroups:
+        - ""
+      resources:
+        - nodes
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - ""
+      resources:
+        - pods
+      verbs:
+        - delete
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - ""
+      resources:
+        - bindings
+        - pods/binding
+      verbs:
+        - create
+    - apiGroups:
+        - ""
+      resources:
+        - pods/status
+      verbs:
+        - patch
+        - update
+    - apiGroups:
+        - ""
+      resources:
+        - replicationcontrollers
+        - services
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - apps
+        - extensions
+      resources:
+        - replicasets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - apps
+      resources:
+        - statefulsets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - policy
+      resources:
+        - poddisruptionbudgets
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - ""
+      resources:
+        - persistentvolumeclaims
+        - persistentvolumes
+      verbs:
+        - get
+        - list
+        - watch
+    - apiGroups:
+        - authentication.k8s.io
+      resources:
+        - tokenreviews
+      verbs:
+        - create
+    - apiGroups:
+        - authorization.k8s.io
+      resources:
+        - subjectaccessreviews
+      verbs:
+        - create
+    - apiGroups:
+        - storage.k8s.io
+      resources:
+        - csinodes
+        - storageclasses
+      verbs:
+        - get
+        - list
+        - watch
