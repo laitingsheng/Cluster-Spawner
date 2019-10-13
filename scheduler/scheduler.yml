@@ -32,7 +32,7 @@ spec:
     - kube-scheduler
     - --config=/usr/local/lib/kube-scheduler/config.yml
     - --write-config-to=/tmp/output.yml
-    image: registry.gitlab.com/research-project-group/scheduler-plugin/custom-kube-scheduler:7156ee35
+    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:7156ee35
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
