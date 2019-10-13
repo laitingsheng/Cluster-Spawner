@@ -2,7 +2,7 @@ set +eux
 
 # label
 kubectl label node --overwrite t-r-k8s-master node-role.kubernetes.io/master=master
-kubectl label node --overwrite t-r-k8s-minion-extra node-role.kubernetes.io/worker=worker
+kubectl label node --overwrite t-r-k8s-minion-extra node-role.kubernetes.io/extra=extra
 printf "%s\n" {1..3}" "{1..4} | awk -F' ' 'BEGIN{TYPES[1]="small";TYPES[2]="medium";TYPES[3]="large";}{print "t-r-k8s-minion-"TYPES[$1]"-"$2}' | xargs -i bash -c "kubectl label node --overwrite {} node-role.kubernetes.io/worker=worker"
 
 # add taint
