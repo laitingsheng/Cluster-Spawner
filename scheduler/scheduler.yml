@@ -30,10 +30,8 @@ spec:
   containers:
   - command:
     - kube-scheduler
-    - --bind-address=127.0.0.1
     - --config=/usr/local/lib/kube-scheduler/config.yml
-    - --leader-elect=true
-    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:90c84942
+    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:e57efb8d
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
