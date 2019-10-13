@@ -79,7 +79,7 @@
         name: T_R-k8s-master
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.xlarge
+        flavor: m1.large
         security_groups:
           - default
           - ssh
@@ -90,7 +90,23 @@
       async: 600
       poll: 0
       register: master_launch_result
-    - name: Launch Kubernetes Minion
+    - name: Launch Kubernetes Extra Minion
+      os_server:
+        state: present
+        name: T_R-k8s-minion-extra
+        availability_zone: "{{ availability_zone }}"
+        image: "{{ image }}"
+        flavor: m1.medium
+        security_groups:
+          - default
+          - ssh
+          - T_R-k8s-rules-minion
+        key_name: "{{ key_name }}"
+        timeout: 600
+      async: 600
+      poll: 0
+      register: minion_extra_launch_result
+    - name: Launch Kubernetes Minions
       os_server:
         state: present
         name: "T_R-k8s-minion-{{ item[0] }}-{{ item[1] }}"
@@ -109,14 +125,21 @@
         - [ 'small', 'medium', 'large' ]
         - "{{ lookup('sequence', 'start=1 count=4') | select('match', '\\d+') | list }}"
       register: minions_launch_results
-    - name: Wait for Kubernetes master
+    - name: Wait for Kubernetes Master
       async_status:
         jid: "{{ master_launch_result.ansible_job_id }}"
       register: job_result
       until: job_result.finished
       retries: 120
       delay: 5
-    - name: Wait for Kubernetes minion
+    - name: Wait for Kubernetes Extra Minion
+      async_status:
+        jid: "{{ minion_extra_launch_result.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 120
+      delay: 5
+    - name: Wait for Kubernetes Minions
       async_status:
         jid: "{{ item.ansible_job_id }}"
       register: job_result
