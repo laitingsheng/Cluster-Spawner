@@ -31,7 +31,7 @@ spec:
   - command:
     - kube-scheduler
     - --config=/usr/local/lib/kube-scheduler/config.yml
-    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:e57efb8d
+    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:0f583aff
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
@@ -45,12 +45,7 @@ spec:
     name: custom-kube-scheduler
     resources:
       requests:
-        cpu: 100m
-  tolerations:
-  - key: "only"
-    operator: "Equal"
-    value: "service"
-    effect: "NoSchedule"
+        cpu: 1000m
   nodeName: t-r-k8s-minion-extra
   imagePullSecrets:
   - name: custom-scheduler-registry-secret
