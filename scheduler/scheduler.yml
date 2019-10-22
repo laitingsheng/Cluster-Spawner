@@ -31,7 +31,7 @@ spec:
   - command:
     - kube-scheduler
     - --config=/usr/local/lib/kube-scheduler/config.yml
-    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:0f3a041e
+    image: registry.gitlab.com/laitingsheng/scheduler-plugins/custom-kube-scheduler:5cd235ea
     imagePullPolicy: IfNotPresent
     livenessProbe:
       failureThreshold: 8
