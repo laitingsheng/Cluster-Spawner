@@ -33,11 +33,11 @@ spec:
           name: http
         resources:
           limits:
-            cpu: 200m
-            memory: 200Mi
+            cpu: 2000m
+            memory: 2000Mi
           requests:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 1000m
+            memory: 1000Mi
         securityContext:
           allowPrivilegeEscalation: false
       nodeSelector:
