@@ -79,7 +79,7 @@
         name: T_R-k8s-master
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.large
+        flavor: m1.xlarge
         security_groups:
           - default
           - ssh
@@ -109,10 +109,10 @@
     - name: Launch Kubernetes Minions
       os_server:
         state: present
-        name: "T_R-k8s-minion-{{ item[0] }}-{{ item[1] }}"
+        name: "T_R-k8s-minion-worker-{{ item }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: "m1.{{ item[0] }}"
+        flavor: m1.large
         security_groups:
           - default
           - ssh
@@ -121,9 +121,7 @@
         timeout: 600
       async: 600
       poll: 0
-      with_nested:
-        - [ 'small', 'medium', 'large' ]
-        - "{{ lookup('sequence', 'start=1 count=4') | select('match', '\\d+') | list }}"
+      with_sequence: start=1 count=8
       register: minions_launch_results
     - name: Wait for Kubernetes Master
       async_status:
