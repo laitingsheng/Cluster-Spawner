@@ -96,7 +96,7 @@
         name: T_R-k8s-minion-extra
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
-        flavor: m1.medium
+        flavor: m1.large
         security_groups:
           - default
           - ssh
