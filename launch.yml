@@ -109,7 +109,7 @@
     - name: Launch Kubernetes Minions
       os_server:
         state: present
-        name: "T-R-k8s-minion-large-{ item }}"
+        name: "T-R-k8s-minion-large-{{ item }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
         flavor: m1.large
