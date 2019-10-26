@@ -1,5 +1,5 @@
 - name: Perform actions prior to initialisation
-  hosts: T_R-k8s-*
+  hosts: T-R-k8s-*
   gather_facts: yes
   become: yes
   remote_user: ubuntu
@@ -91,7 +91,7 @@
           - docker
 
 - name: Initialise Kubernetes Master
-  hosts: T_R-k8s-master
+  hosts: T-R-k8s-master
   gather_facts: yes
   become: yes
   remote_user: ubuntu
@@ -127,7 +127,7 @@
         command: "{{ k8s_join_command.stdout }}"
 
 - name: Initialise Kubernetes Minions
-  hosts: T_R-k8s-minion-*
+  hosts: T-R-k8s-minion-*
   gather_facts: yes
   become: yes
   remote_user: ubuntu
