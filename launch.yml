@@ -93,7 +93,7 @@
     - name: Launch Kubernetes Extra Minion
       os_server:
         state: present
-        name: T-R-k8s-minion-extra
+        name: T-R-k8s-minion-service
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
         flavor: m1.large
@@ -109,7 +109,7 @@
     - name: Launch Kubernetes Minions
       os_server:
         state: present
-        name: "T-R-k8s-minion-large-{{ item }}"
+        name: "T-R-k8s-minion-worker-{{ item }}"
         availability_zone: "{{ availability_zone }}"
         image: "{{ image }}"
         flavor: m1.large
@@ -121,7 +121,7 @@
         timeout: 600
       async: 600
       poll: 0
-      with_sequence: start=0 count=8
+      with_sequence: start=1 count=8
       register: minions_launch_results
     - name: Wait for Kubernetes Master
       async_status:
